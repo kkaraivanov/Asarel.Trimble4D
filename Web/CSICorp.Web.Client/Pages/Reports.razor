@@ -1,0 +1,278 @@
+﻿@page "/reports"
+@page "/reports/{fileName}"
+@using CSICorp.Web.Client.Helpers
+@using CSICorp.Web.Client.Models
+@using CSICorp.Web.Client.Services
+
+@inject IJSRuntime JSRuntime
+@inject HttpClient _httpClient
+
+<div class="p-4">
+    <h2 class="text-center">Отчети</h2>
+</div>
+
+@if (FileName != null)
+{
+    @if (_fileName != null)
+    {
+        @if (_sensors != null)
+        {
+            <table class="table table-striped table-hover table-bordered border-primary" style="width: 100%;">
+                <thead>
+                    <tr class="table-light">
+                        <th colspan="9">Изготвяне на отчет за сондажни кладенци @_status</th>
+                    </tr>
+                    <tr class="table-primary">
+                        <th>Сензор</th>
+                        <th>Сред. сед.</th>
+                        @foreach (var key in _sensors.Header)
+                        {
+                            <th>@key</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="table-info">
+                    @foreach (var (key, value) in _sensors.Body.Where(x => x.Key.Contains("SK")))
+                    {
+                        <tr>
+                            <td>@key</td>
+                            @foreach (var debit in value)
+                            {
+                                if (debit == "0")
+                                {
+                                    <td>-</td>
+                                }
+                                else
+                                {
+                                    <td>@debit</td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <br />
+            <table class="table table-striped table-hover table-bordered border-primary" style="width: 100%;">
+                <thead>
+                    <tr class="table-light">
+                        <th colspan="9">Изготвяне на отчет за заустени хоризонтални сондажи @_status</th>
+                    </tr>
+                    <tr class="table-primary">
+                        <th>Сензор</th>
+                        <th>Сред. сед.</th>
+                        @foreach (var key in _sensors.Header)
+                        {
+                            <th>@key</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="table-info">
+                    @foreach (var (key, value) in _sensors.Body.Where(x => x.Key.Contains("NC")))
+                    {
+                        <tr>
+                            <td>@key</td>
+                            @foreach (var debit in value)
+                            {
+                                if (debit == "0")
+                                {
+                                    <td>-</td>
+                                }
+                                else
+                                {
+                                    <td>@debit</td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <br />
+        @if (_whoter != null)
+        {
+            <table class="table table-striped table-hover table-bordered border-primary" style="width: 100%;">
+                <thead>
+                    <tr class="table-light">
+                        <th colspan="9">Изготвяне на отчет за водни нива на сондажни кладенци @_status</th>
+                    </tr>
+                    <tr class="table-primary">
+                        <th>Сензор</th>
+                        <th>Сред. сед.</th>
+                        @foreach (var key in _whoter.Header)
+                        {
+                            <th>@key</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody class="table-info">
+                    @foreach (var (key, value) in _whoter.Body)
+                    {
+                        <tr>
+                            <td>@key</td>
+                            @foreach (var debit in value)
+                            {
+                                if (debit == "0")
+                                {
+                                    <td>-</td>
+                                }
+                                else
+                                {
+                                    <td>@debit</td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <div class="d-flex justify-content-between" style="width: 100%">
+            <div class="col-3 align-self-center csicorp-input">
+                <div class="btn btn-outline-primary">
+                    <InputFile OnChange="OnInputFileChangeBeforePeriode" accept=".zip" />
+                    Избери предходен период
+                </div>
+            </div>
+            <div class="d-flex justify-content-end" style="width: 100%">
+                <div class="p-4">
+                    <button type="button" class="btn btn-outline-primary" @onclick="DownloadFile">Създай отчет</button>
+                </div>
+                <div class="p-4">
+                    <button type="button" class="btn btn-outline-danger" @onclick="DeleteData">Изтрии всичко</button>
+                </div>
+            </div>
+        </div>
+        @if (IsDownloadStarted == 1)
+        {
+            <p>Файлът се експортира... Моля изчакайте</p>
+        }
+        else if (IsDownloadStarted == 2)
+        {
+            <p>Експортирането приключи.</p>
+        }
+    }
+}
+else
+{
+    if (!isReaded)
+    {
+        <div class="col-3 csicorp-input">
+            <div class="btn btn-outline-primary">
+                <InputFile OnChange="OnInputFileChange" accept=".zip" />
+                Избери файл
+            </div>
+        </div>
+        @_status
+    }
+    else
+    {
+        <div class="drag-drop-zone">
+            <h3 class="p-2">Име на прочетения файл <span class="badge bg-info text-dark">@_fileName</span></h3>
+            <br />
+            @if (_entries.Any())
+            {
+                <h3 class="mt-2 p-2">Файлове за изготвяне на отчет</h3>
+                <ul>
+                    @foreach (var item in _entries.Where(x => !x.Name.EndsWith("/")))
+                    {
+                        <li>
+                            <h4>@item.Name</h4>
+                            <div class="mb-3" style="width: 65%; height: 200px; overflow: auto">
+                                <pre>@item.Content</pre>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            <div class="d-flex justify-content-end" style="width: 100%">
+                <div class="p-4">
+                    <button type="button" class="btn btn-outline-primary" @onclick="CreateTable">Преглед в таблица</button>
+                </div>
+                <div class="p-4">
+                    <button type="button" class="btn btn-outline-danger" @onclick="DeleteData">Изтрии всичко</button>
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+    }
+}
+
+
+
+@code {
+    [Parameter]
+    public string FileName { get; set; }
+    public int IsDownloadStarted { get; set; } = 0;
+
+    private const string DefaultStatus = "Изберете zip файл...";
+    private List<ZipEntry> _entries;
+    private SensorTable _sensors;
+    private SensorTable _whoter;
+    private string _fileName;
+    private string _firstDate;
+    private string _endDate;
+    private string _status = DefaultStatus;
+    private bool isReaded;
+
+    [Inject] private ZipService ZipService { get; set; }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        await using var stream = e.File.OpenReadStream();
+
+        _entries = await ZipService.ExtractFiles(stream);
+        _sensors = await _entries.GetDrillWheelsDataAsync();
+        _whoter = await _entries.GetDrillWheelsDataAsync(true);
+        ;
+        _fileName = e.File.Name;
+        isReaded = true;
+    }
+
+    private async Task OnInputFileChangeBeforePeriode(InputFileChangeEventArgs e)
+    {
+
+    }
+
+    private void DeleteData()
+    {
+        Reset();
+    }
+
+    private void CreateTable()
+    {
+        FileName = _fileName;
+        _firstDate = _sensors.Header[0];
+        _endDate = _sensors.Header[_sensors.Header.Count - 1];
+        _status = $"за периода {_firstDate} - {_endDate}";
+    }
+
+    protected async Task DownloadFile()
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", $"Искате ли да експортирате във файл?"))
+        {
+            IsDownloadStarted = 1;
+            StateHasChanged();
+            var excellPackage = await ExcelHelper.CreateReportAppendixTwo(_sensors);
+            var fileName = $"Report {_firstDate} - {_endDate}.xlsx";
+            await JSRuntime.InvokeAsync<object>("saveAsFile", fileName, Convert.ToBase64String(excellPackage));
+            IsDownloadStarted = 2;
+            Reset();
+        }
+    }
+
+    protected void Reset()
+    {
+        _entries = new List<ZipEntry>();
+        _sensors = new SensorTable();
+        _whoter = new SensorTable();
+        _fileName = null;
+        _firstDate = null;
+        _endDate = null;
+        isReaded = false;
+        _status = DefaultStatus;
+        FileName = null;
+        IsDownloadStarted = 0;
+        StateHasChanged();
+    }
+}
