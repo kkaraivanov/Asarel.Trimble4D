@@ -48,13 +48,13 @@
                 var tableTwo = CreateTable(worksheet, header, body, TABLE_TWO_TITLE, "NC", tableOne);
                 var tableNotes = AddTableNote(worksheet, TABLE_NOTE, tableTwo);
 
-                if (tableBeforePeriod != null)
-                {
-                    var beforeHeader = table.Header.ToArray();
-                    var beforeBody = table.Body;
-                    _beforePeriodStartDate = beforeHeader[0];
-                    _beforePeriodEndDate = beforeHeader[^1];
-                }
+                //if (tableBeforePeriod != null)
+                //{
+                //    var beforeHeader = table.Header.ToArray();
+                //    var beforeBody = table.Body;
+                //    _beforePeriodStartDate = beforeHeader[0];
+                //    _beforePeriodEndDate = beforeHeader[^1];
+                //}
 
                 var tableLast = CreateLastTable(worksheet, tableOne, tableTwo, tableNotes);
 
@@ -97,7 +97,7 @@
             headerBeforePeriod.Style.Border.BorderAround(ExcelBorderStyle.Thin);
             headerBeforePeriod.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             headerBeforePeriod.Merge = true;
-            var firstDate = _beforePeriodStartDate.Substring(0, _currentPeriodStartDate.Length - 5);
+            var firstDate = ""; //_beforePeriodStartDate.Substring(0, _currentPeriodStartDate.Length - 5);
             headerBeforePeriod.Value = $"{firstDate}-{_beforePeriodEndDate}";
 
             var headerCurrentPeriod = worksheet.Cells[row, col1 + 2, row, col1 + 3];
