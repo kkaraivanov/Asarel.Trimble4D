@@ -29,7 +29,7 @@
 
 > #### Приложението е базирано на [.NET Core](https://en.wikipedia.org/wiki/.NET_Core) фреймуорк и [WASM](https://en.wikipedia.org/wiki/WebAssembly) Blazor технологията. <br/> 
 > * #### За frondEnd, като програмен език са използвани HTML, CSS и JS, но на този етап от проекта не се използват Cookies, Local и Session storage.
-> * #### а backhend, като програмен език е използван C#, който реализира функционалността по изчисление на входните данни и генериране на отчет във файла на [Microsoft Office](https://www.microsoft.com).
+> * #### За backhend, като програмен език е използван C#, който реализира функционалността по изчисление на входните данни и генериране на отчет във файла на [Microsoft Office](https://www.microsoft.com).
 ---
 
 ## **Функционалност**
