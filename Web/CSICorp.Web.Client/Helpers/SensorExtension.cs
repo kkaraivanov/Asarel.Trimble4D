@@ -51,26 +51,49 @@
                 counter++;
             }
 
-            foreach (var (key, value) in result.Body)
+            if(!isWater)
             {
-                var average = 0.00;
-                var count = value.Count;
-
-                if (count != result.Header.Count)
+                foreach (var (key, value) in result.Body)
                 {
-                    for (int i = count; i < result.Header.Count; i++)
-                        value.Add("0");
+                    var average = 0.00;
+                    var count = value.Count;
+
+                    if (count != result.Header.Count)
+                    {
+                        for (int i = count; i < result.Header.Count; i++)
+                            value.Add("0");
+                    }
+
+                    value.ForEach(x => { average += double.Parse(x); });
+
+                    average = average / result.Header.Count;
+                    value.Insert(0, average.ToString(DOUBLE_FORMAT));
                 }
-
-                value.ForEach(x =>
-                {
-                    average += double.Parse(x);
-                });
-
-                average = average / result.Header.Count;
-                value.Insert(0, average.ToString(DOUBLE_FORMAT));
             }
+            else
+            {
+                foreach (var (key, value) in result.Body)
+                {
+                    var max = double.MinValue;
+                    var count = value.Count;
 
+                    if (count != result.Header.Count)
+                    {
+                        for (int i = count; i < result.Header.Count; i++)
+                            value.Add("0");
+                    }
+
+                    value.ForEach(x =>
+                    {
+                        var currentValue = double.Parse(x);
+                        if (currentValue > max)
+                            max = currentValue;
+                    });
+
+                    value.Insert(0, max.ToString(DOUBLE_FORMAT));
+                }
+            }
+            
             return result;
         }
 
@@ -163,6 +186,11 @@
                         var sensorName = GetName(currentLine[1].TrimStart(), isWater);
                         debitValue = tempDebit >= MINIMUM_VALUE ? tempDebit : 0;
 
+                        if (!sensorName.Contains('-'))
+                        {
+                            sensorName = new string(sensorName.Insert(2, "-"));
+                        }
+
                         sensor = new Sensor
                         {
                             DateStamp = currentLine[0],
@@ -190,6 +218,11 @@
 
                         var debitValue = !double.TryParse(currentLine[2], out double debit) ? 0 : debit;
                         var sensorName = GetName(currentLine[1].TrimStart(), isWater);
+
+                        if (!sensorName.Contains('-'))
+                        {
+                            sensorName = new string(sensorName.Insert(2, "-"));
+                        }
 
                         sensor = new Sensor
                         {
@@ -261,7 +294,7 @@
                         builder.Append(name[i]);
                     }
 
-                    name = new string(builder.ToString().Trim().Replace(' ', '-'));
+                    name = new string(builder.ToString().Trim().Replace(" ", ""));
                 }
                 else if (countWhiteSpace == 1)
                 {

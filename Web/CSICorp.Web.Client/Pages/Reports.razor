@@ -97,7 +97,7 @@
                     </tr>
                     <tr class="table-primary">
                         <th>Сензор</th>
-                        <th>Сред. сед.</th>
+                        <th>Макс. сед.</th>
                         @foreach (var key in _whoter.Header)
                         {
                             <th>@key</th>
@@ -209,11 +209,15 @@ else
     private List<ZipEntry> _entries;
     private SensorTable _sensors;
     private SensorTable _whoter;
+    private SensorTable _sensorsBefore;
+    private SensorTable _whoterBefore;
     private string _fileName;
     private string _firstDate;
     private string _endDate;
     private string _status = DefaultStatus;
+    private string _statusBefore = DefaultStatus;
     private bool isReaded;
+    private bool isReadedBefore;
 
     [Inject] private ZipService ZipService { get; set; }
 
@@ -224,7 +228,7 @@ else
         _entries = await ZipService.ExtractFiles(stream);
         _sensors = await _entries.GetDrillWheelsDataAsync();
         _whoter = await _entries.GetDrillWheelsDataAsync(true);
-        ;
+        
         _fileName = e.File.Name;
         isReaded = true;
     }
@@ -265,12 +269,16 @@ else
     {
         _entries = new List<ZipEntry>();
         _sensors = new SensorTable();
+        _sensorsBefore = new SensorTable();
         _whoter = new SensorTable();
+        _whoterBefore = new SensorTable();
         _fileName = null;
         _firstDate = null;
         _endDate = null;
         isReaded = false;
+        isReadedBefore = false;
         _status = DefaultStatus;
+        _statusBefore = DefaultStatus;
         FileName = null;
         IsDownloadStarted = 0;
         StateHasChanged();

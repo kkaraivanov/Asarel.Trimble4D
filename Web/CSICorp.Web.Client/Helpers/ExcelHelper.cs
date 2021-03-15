@@ -8,7 +8,6 @@
     using Models;
     using OfficeOpenXml;
     using OfficeOpenXml.Style;
-    using Pages;
 
     public static class ExcelHelper
     {
@@ -30,6 +29,8 @@
 
         private static string _currentPeriodStartDate;
         private static string _currentPeriodEndDate;
+        private static string _beforePeriodStartDate = "";
+        private static string _beforePeriodEndDate = "";
 
         public static async Task<byte[]> CreateReportAppendixTwo(SensorTable table, SensorTable tableBeforePeriod = null)
         {
@@ -37,7 +38,6 @@
             var body = table.Body;
             _currentPeriodStartDate = header[0];
             _currentPeriodEndDate = header[^1];
-
 
             var stream = new MemoryStream();
             using var package = new ExcelPackage(stream);
@@ -47,6 +47,14 @@
                 var tableOne = CreateTable(worksheet, header, body, TABLE_ONE_TITLE, "SK", 4);
                 var tableTwo = CreateTable(worksheet, header, body, TABLE_TWO_TITLE, "NC", tableOne);
                 var tableNotes = AddTableNote(worksheet, TABLE_NOTE, tableTwo);
+
+                if (tableBeforePeriod != null)
+                {
+                    var beforeHeader = table.Header.ToArray();
+                    var beforeBody = table.Body;
+                    _beforePeriodStartDate = beforeHeader[0];
+                    _beforePeriodEndDate = beforeHeader[^1];
+                }
 
                 var tableLast = CreateLastTable(worksheet, tableOne, tableTwo, tableNotes);
 
@@ -89,8 +97,8 @@
             headerBeforePeriod.Style.Border.BorderAround(ExcelBorderStyle.Thin);
             headerBeforePeriod.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             headerBeforePeriod.Merge = true;
-            var firstDate = ""; //TODO: create feeld for before value _currentPeriodStartDate.Substring(0, _currentPeriodStartDate.Length - 5);
-            headerBeforePeriod.Value = ""; //TODO: Add value from file for before periode
+            var firstDate = _beforePeriodStartDate.Substring(0, _currentPeriodStartDate.Length - 5);
+            headerBeforePeriod.Value = $"{firstDate}-{_beforePeriodEndDate}";
 
             var headerCurrentPeriod = worksheet.Cells[row, col1 + 2, row, col1 + 3];
             headerCurrentPeriod.Style.Border.BorderAround(ExcelBorderStyle.Thin);
@@ -146,7 +154,7 @@
             row++;
             AddDataToLastTable(worksheet, row++, TABLE_ONE_TITLE, 0.00, 0.00, tableOneAfterLs, tableOneAfterMt);
             AddDataToLastTable(worksheet, row++, TABLE_TWO_TITLE, 0.00, 0.00, tableTwoAfterLs, tableTwoAfterMt);
-            
+
             return 1;
         }
 
@@ -185,7 +193,7 @@
             worksheet.Cells[row, col4].Style.Numberformat.Format = "0.000";
             worksheet.Cells[row, col4].Formula = $"={afterMt}";
 
-            var col5Value=  worksheet.Cells[row, col5];
+            var col5Value = worksheet.Cells[row, col5];
             col5Value.Style.Border.BorderAround(ExcelBorderStyle.Thin);
             col5Value.Style.Numberformat.Format = "0.000";
             //col5Value.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
