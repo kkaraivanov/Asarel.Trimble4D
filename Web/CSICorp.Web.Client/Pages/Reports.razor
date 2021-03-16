@@ -15,7 +15,7 @@
 {
     @if (_fileName != null)
     {
-        @if (_sensors != null)
+        @if (_currentPeriodeDebit != null)
         {
             <table class="table table-striped table-hover table-bordered border-primary" style="width: 100%;">
                 <thead>
@@ -25,14 +25,14 @@
                     <tr class="table-primary">
                         <th>Сензор</th>
                         <th>Сред. сед.</th>
-                        @foreach (var key in _sensors.Header)
+                        @foreach (var key in _currentPeriodeDebit.Header)
                         {
                             <th>@key</th>
                         }
                     </tr>
                 </thead>
                 <tbody class="table-info">
-                    @foreach (var (key, value) in _sensors.Body.Where(x => x.Key.Contains("SK")))
+                    @foreach (var (key, value) in _currentPeriodeDebit.Body.Where(x => x.Key.Contains("SK")))
                     {
                         <tr>
                             <td>@key</td>
@@ -60,14 +60,14 @@
                     <tr class="table-primary">
                         <th>Сензор</th>
                         <th>Сред. сед.</th>
-                        @foreach (var key in _sensors.Header)
+                        @foreach (var key in _currentPeriodeDebit.Header)
                         {
                             <th>@key</th>
                         }
                     </tr>
                 </thead>
                 <tbody class="table-info">
-                    @foreach (var (key, value) in _sensors.Body.Where(x => x.Key.Contains("NC")))
+                    @foreach (var (key, value) in _currentPeriodeDebit.Body.Where(x => x.Key.Contains("NC")))
                     {
                         <tr>
                             <td>@key</td>
@@ -88,7 +88,7 @@
             </table>
         }
         <br />
-        @if (_whoter != null)
+        @if (_currentPeriodeWaterLevel != null)
         {
             <table class="table table-striped table-hover table-bordered border-primary" style="width: 100%;">
                 <thead>
@@ -98,14 +98,14 @@
                     <tr class="table-primary">
                         <th>Сензор</th>
                         <th>Макс. сед.</th>
-                        @foreach (var key in _whoter.Header)
+                        @foreach (var key in _currentPeriodeWaterLevel.Header)
                         {
                             <th>@key</th>
                         }
                     </tr>
                 </thead>
                 <tbody class="table-info">
-                    @foreach (var (key, value) in _whoter.Body)
+                    @foreach (var (key, value) in _currentPeriodeWaterLevel.Body)
                     {
                         <tr>
                             <td>@key</td>
@@ -127,11 +127,14 @@
         }
 
         <div class="d-flex justify-content-between" style="width: 100%">
-            <div class="col-3 align-self-center csicorp-input">
-                <div class="btn btn-outline-primary">
-                    <InputFile OnChange="OnInputFileChangeBeforePeriode" accept=".zip" />
-                    Избери предходен период
+            <div class="d-flex flex-wrap col-4">
+                <div class="col-12 align-self-center csicorp-input">
+                    <div class="btn btn-outline-primary">
+                        <InputFile OnChange="OnInputFileChangeBeforePeriode" accept=".zip" />
+                        Избери предходен период
+                    </div>
                 </div>
+                @_statusBefore
             </div>
             <div class="d-flex justify-content-end" style="width: 100%">
                 <div class="p-4">
@@ -142,6 +145,7 @@
                 </div>
             </div>
         </div>
+        <br />
         @if (IsDownloadStarted == 1)
         {
             <p>Файлът се експортира... Моля изчакайте</p>
@@ -150,6 +154,7 @@
         {
             <p>Експортирането приключи.</p>
         }
+        <br />
     }
 }
 else
@@ -207,17 +212,17 @@ else
 
     private const string DefaultStatus = "Изберете zip файл...";
     private List<ZipEntry> _entries;
-    private SensorTable _sensors;
-    private SensorTable _whoter;
-    private SensorTable _sensorsBefore;
-    private SensorTable _whoterBefore;
+    private SensorTable _currentPeriodeDebit;
+    private SensorTable _currentPeriodeWaterLevel;
+    private SensorTable _beforePeriodeDebit;
+    private SensorTable _beforePeriodeWaterLevel;
     private string _fileName;
     private string _firstDate;
     private string _endDate;
     private string _status = DefaultStatus;
     private string _statusBefore = DefaultStatus;
     private bool isReaded;
-    private bool isReadedBefore;
+    private bool isReadedBeforePeriode;
 
     [Inject] private ZipService ZipService { get; set; }
 
@@ -226,16 +231,25 @@ else
         await using var stream = e.File.OpenReadStream();
 
         _entries = await ZipService.ExtractFiles(stream);
-        _sensors = await _entries.GetDrillWheelsDataAsync();
-        _whoter = await _entries.GetDrillWheelsDataAsync(true);
-        
+        _currentPeriodeDebit = await _entries.GetDrillWheelsDataAsync();
+        _currentPeriodeWaterLevel = await _entries.GetDrillWheelsDataAsync(true);
+        ;
         _fileName = e.File.Name;
         isReaded = true;
     }
 
     private async Task OnInputFileChangeBeforePeriode(InputFileChangeEventArgs e)
     {
+        await using var stream = e.File.OpenReadStream();
+        var zipService = await ZipService.ExtractFiles(stream);
+        _beforePeriodeDebit = await zipService.GetDrillWheelsDataAsync();
+        _beforePeriodeWaterLevel = await zipService.GetDrillWheelsDataAsync(true);
 
+        if (_beforePeriodeDebit != null && _beforePeriodeWaterLevel != null)
+        {
+            _statusBefore = $"Файлът {e.File.Name} е прочетен.";
+            isReadedBeforePeriode = true;
+        }
     }
 
     private void DeleteData()
@@ -246,8 +260,8 @@ else
     private void CreateTable()
     {
         FileName = _fileName;
-        _firstDate = _sensors.Header[0];
-        _endDate = _sensors.Header[_sensors.Header.Count - 1];
+        _firstDate = _currentPeriodeDebit.Header[0];
+        _endDate = _currentPeriodeDebit.Header[_currentPeriodeDebit.Header.Count - 1];
         _status = $"за периода {_firstDate} - {_endDate}";
     }
 
@@ -257,9 +271,24 @@ else
         {
             IsDownloadStarted = 1;
             StateHasChanged();
-            var excellPackage = await ExcelHelper.CreateReportAppendixTwo(_sensors);
+
+            var excellPackage = await ExcelReports.CreateReport(FileName, _currentPeriodeDebit);
+
+            if (isReadedBeforePeriode)
+            {
+                var waterSensorsData = await _httpClient.GetFromJsonAsync<List<WaterLevelSensors>>("sample-data/waterLevelSensors.json");
+                excellPackage = await ExcelReports.CreateReport(
+                FileName,
+                _currentPeriodeDebit,
+                _currentPeriodeWaterLevel,
+                _beforePeriodeDebit,
+                _beforePeriodeWaterLevel,
+                    waterSensorsData);
+            }
+
             var fileName = $"Report {_firstDate} - {_endDate}.xlsx";
             await JSRuntime.InvokeAsync<object>("saveAsFile", fileName, Convert.ToBase64String(excellPackage));
+
             IsDownloadStarted = 2;
             Reset();
         }
@@ -268,15 +297,15 @@ else
     protected void Reset()
     {
         _entries = new List<ZipEntry>();
-        _sensors = new SensorTable();
-        _sensorsBefore = new SensorTable();
-        _whoter = new SensorTable();
-        _whoterBefore = new SensorTable();
+        _currentPeriodeDebit = new SensorTable();
+        _beforePeriodeDebit = new SensorTable();
+        _currentPeriodeWaterLevel = new SensorTable();
+        _beforePeriodeWaterLevel = new SensorTable();
         _fileName = null;
         _firstDate = null;
         _endDate = null;
         isReaded = false;
-        isReadedBefore = false;
+        isReadedBeforePeriode = false;
         _status = DefaultStatus;
         _statusBefore = DefaultStatus;
         FileName = null;
