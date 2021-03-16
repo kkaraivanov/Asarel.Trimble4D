@@ -1,0 +1,182 @@
+﻿[
+  {
+    "name": "SK-13",
+    "elevation": 1173.307,
+    "depth": 699
+  },
+  {
+    "name": "SK-16",
+    "elevation": 903.75,
+    "depth": 415
+  },
+  {
+    "name": "SK-18",
+    "elevation": 895.188,
+    "depth": 171
+  },
+  {
+    "name": "SK-19",
+    "elevation": 1095.646,
+    "depth": 187.4
+  },
+  {
+    "name": "SK-20",
+    "elevation": 1140.819,
+    "depth": 202
+  },
+  {
+    "name": "SK-22",
+    "elevation": 676.291,
+    "depth": 200
+  },
+  {
+    "name": "SK-25",
+    "elevation": 675.543,
+    "depth": 200
+  },
+  {
+    "name": "SK-27",
+    "elevation": 932.209,
+    "depth": 200
+  },
+  {
+    "name": "SK-30",
+    "elevation": 952.555,
+    "depth": 200
+  },
+  {
+    "name": "SK-32",
+    "elevation": 780.795,
+    "depth": 200
+  },
+  {
+    "name": "SK-33",
+    "elevation": 765.449,
+    "depth": 200
+  },
+  {
+    "name": "SK-38",
+    "elevation": 706.392,
+    "depth": 200
+  },
+  {
+    "name": "SK-39",
+    "elevation": 691.775,
+    "depth": 200
+  },
+  {
+    "name": "SK-40",
+    "elevation": 827.182,
+    "depth": 200
+  },
+  {
+    "name": "EG-24",
+    "elevation": 1175.100,
+    "depth": 150
+  },
+  {
+    "name": "EG-28",
+    "elevation": 969.000,
+    "depth": 400
+  },
+  {
+    "name": "EG-38",
+    "elevation": 855.020,
+    "depth": 150
+  },
+  {
+    "name": "EG-39",
+    "elevation": 812.748,
+    "depth": 150
+  },
+  {
+    "name": "EG-8",
+    "elevation": 905.280,
+    "depth": 150
+  },
+  {
+    "name": "EG-41",
+    "elevation": 1149.404,
+    "depth": 218.2
+  },
+  {
+    "name": "EG-42",
+    "elevation": 1140.000,
+    "depth": 249.8
+  },
+  {
+    "name": "EG-43",
+    "elevation": 1094.505,
+    "depth": 252
+  },
+  {
+    "name": "EG-45",
+    "elevation": 1095.697,
+    "depth": 242
+  },
+  {
+    "name": "EG-46",
+    "elevation": 902.883,
+    "depth": 200
+  },
+  {
+    "name": "EG-47",
+    "elevation": 953.641,
+    "depth": 200
+  },
+  {
+    "name": "EG-48",
+    "elevation": 975.280,
+    "depth": 200
+  },
+  {
+    "name": "EG-49",
+    "elevation": 944.683,
+    "depth": 200
+  },
+  {
+    "name": "EG-50",
+    "elevation": 795.978,
+    "depth": 200
+  },
+  {
+    "name": "EG-53",
+    "elevation": 676.756,
+    "depth": 200
+  },
+  {
+    "name": "EG-56",
+    "elevation": 675.267,
+    "depth": 200
+  },
+  {
+    "name": "EG-58",
+    "elevation": 915.977,
+    "depth": 200
+  },
+  {
+    "name": "EG-59",
+    "elevation": 971.585,
+    "depth": 200
+  },
+  {
+    "name": "EG-60",
+    "elevation": 826.205,
+    "depth": 200
+  },
+  {
+    "name": "EG-61",
+    "elevation": 854.660,
+    "depth": 200
+  },
+  {
+    "name": "EG-67",
+    "elevation": 885.830,
+    "depth": 200
+  },
+  {
+    "name": "EG-68",
+    "elevation": 935.970,
+    "depth": 200
+  }
+]
