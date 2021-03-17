@@ -62,6 +62,8 @@
 > <img src="./images/seccondPage5.JPG">
 > <br /><br />
 > <img src="./images/seccondPage6.JPG">
+> <br /><br />
+> <img src="./images/seccondPage7.JPG">
 > </br>
 > 
 </br>
