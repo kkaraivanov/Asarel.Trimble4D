@@ -6,16 +6,18 @@
 # <img src="https://img.shields.io/badge/c%23%20-%23239120.svg?&style=for-the-badge&logo=c-sharp&logoColor=white"/> **CSICorp INTELLIGENT SYSTEMS**
 
 <table  border = '0' class="w-100">
+
   <tr>
-    <td>
-        <img align="left" width="116" height="116" src="./favicon.ico" >
-    </td>
-    <td> 
+  <td>
+    <img align="left" width="116" height="116" src="./favicon.ico" >
+  </td>
+  <td class="w-100">
 
-## CSICorp INTELLIGENT SYSTEMS
-### Костадин Караиванов
+  ## CSICorp INTELLIGENT SYSTEMS </p>
+  ### Костадин Караиванов
 
-</tr>
+  </td>
+  </tr>
 </table>
 <br />
 
