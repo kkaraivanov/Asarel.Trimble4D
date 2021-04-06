@@ -16,6 +16,23 @@
 
         public static async Task<SensorTable> GetDrillWheelsDataAsync(this List<ZipEntry> entries, bool isWater = false)
         {
+            var result = ImputDataToTable(entries, isWater);
+
+            if(!isWater)
+            {
+                result.IsNotWater();
+
+            }
+            else
+            {
+                result.IsWater();
+            }
+            
+            return result;
+        }
+
+        private static SensorTable ImputDataToTable(List<ZipEntry> entries, bool isWater = false)
+        {
             var result = new SensorTable();
             var counter = 0;
 
@@ -51,49 +68,6 @@
                 counter++;
             }
 
-            if(!isWater)
-            {
-                foreach (var (key, value) in result.Body)
-                {
-                    var average = 0.00;
-                    var count = value.Count;
-
-                    if (count != result.Header.Count)
-                    {
-                        for (int i = count; i < result.Header.Count; i++)
-                            value.Add("0");
-                    }
-
-                    value.ForEach(x => { average += double.Parse(x); });
-
-                    average = average / result.Header.Count;
-                    value.Insert(0, average.ToString(DOUBLE_FORMAT));
-                }
-            }
-            else
-            {
-                foreach (var (key, value) in result.Body)
-                {
-                    var max = double.MinValue;
-                    var count = value.Count;
-
-                    if (count != result.Header.Count)
-                    {
-                        for (int i = count; i < result.Header.Count; i++)
-                            value.Add("0");
-                    }
-
-                    value.ForEach(x =>
-                    {
-                        var currentValue = double.Parse(x);
-                        if (currentValue > max)
-                            max = currentValue;
-                    });
-
-                    value.Insert(0, max.ToString(DOUBLE_FORMAT));
-                }
-            }
-            
             return result;
         }
 
@@ -302,6 +276,47 @@
                 }
 
                 return name;
+            }
+        }
+
+        private static void IsWater(this SensorTable table)
+        {
+            foreach (var (key, value) in table.Body)
+            {
+                var count = value.Count;
+                if (count != table.Header.Count)
+                {
+                    for (int i = count; i < table.Header.Count; i++)
+                        value.Add("0");
+                }
+
+                var dailyValues = new List<double>();
+                value.ForEach(x => { dailyValues.Add(double.Parse(x)); });
+
+                var max = dailyValues.Max();
+                value.Insert(0, max.ToString(DOUBLE_FORMAT));
+            }
+        }
+
+        private static void IsNotWater(this SensorTable table)
+        {
+            foreach (var (key, value) in table.Body)
+            {
+                var count = value.Count;
+                if (count != table.Header.Count)
+                {
+                    for (int i = count; i < table.Header.Count; i++)
+                        value.Add("0");
+                }
+
+                var dailyValues = new List<double>();
+                value.ForEach(x => { dailyValues.Add(double.Parse(x)); });
+
+                var average = 0.00;
+                if (dailyValues.Any(x => x != 0))
+                    average = dailyValues.Where(x => x != 0).Average();
+
+                value.Insert(0, average.ToString(DOUBLE_FORMAT));
             }
         }
     }
